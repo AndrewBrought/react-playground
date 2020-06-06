@@ -1,26 +1,30 @@
+import './App.css';
 import React, { Component } from 'react';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 import Headers from "./components/layout/headers";
 import Todos from './components/Todos';
 import AddTodo from './components/AddTodo';
-import uuid from 'uuid';
+import About from './components/pages/About';
+import { v4 as uuidv4 } from 'uuid';
 
-import './App.css';
+//Was struggling to figure out why my uuid wasn't working...I needed to claim it as { v4 as uuidv4 } instead of just import uuid ...
+
 
 class App extends Component {
     state = {
         todos: [
             {
-            id: uuid.v4(),
+            id: uuidv4(),
             title: 'Take out the trash',
             completed: false
             },
             {
-            id: uuid.v4(),
+            id: uuidv4(),
             title: 'Dinner with wife',
             completed: false
             },
             {
-            id: uuid.v4(),
+            id: uuidv4(),
             title: 'Meeting with boss',
             completed: false
             }
@@ -46,7 +50,7 @@ class App extends Component {
     addTodo = (title) => {
         // console.log(title)
         const newTodo = {
-            id: uuid.v4(),
+            id: uuidv4(),
             title,
             completed: false
         }
@@ -56,13 +60,20 @@ class App extends Component {
   render() {
         // console.log(this.state.todos);
     return (
-        <div className="App">
-            <div className="container">
-                <Headers />
-                <AddTodo addTodo={this.addTodo} />
-                <Todos todos={this.state.todos} markComplete={this.markComplete} delTodo={this.delTodo}/>
+        <Router>
+            <div className="App">
+                <div className="container">
+                    <Headers />
+                    <Route exact path="/" render={props => (  //This is how we're able to load both of these components at the same time using React Router
+                        <React.Fragment>
+                            <AddTodo addTodo={this.addTodo} />
+                            <Todos todos={this.state.todos} markComplete={this.markComplete} delTodo={this.delTodo}/>
+                        </React.Fragment>
+                    )} />
+                    <Route path="/about" component={About} />
+                </div>
             </div>
-        </div>
+        </Router>
     );
   }
 }
