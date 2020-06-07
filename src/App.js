@@ -6,29 +6,19 @@ import Todos from './components/Todos';
 import AddTodo from './components/AddTodo';
 import About from './components/pages/About';
 import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
 
 //Was struggling to figure out why my uuid wasn't working...I needed to claim it as { v4 as uuidv4 } instead of just import uuid ...
 
 
 class App extends Component {
     state = {
-        todos: [
-            {
-            id: uuidv4(),
-            title: 'Take out the trash',
-            completed: false
-            },
-            {
-            id: uuidv4(),
-            title: 'Dinner with wife',
-            completed: false
-            },
-            {
-            id: uuidv4(),
-            title: 'Meeting with boss',
-            completed: false
-            }
-        ]
+        todos: []
+    }
+
+    componentDidMount() {
+        axios.get('http://jsonplaceholder.typicode.com/todos?_limit=10')
+            .then(res => this.setState({ todos: res.data }))
     }
 
     // Toggle Complete
@@ -43,18 +33,20 @@ class App extends Component {
 
   //   Delete Todo
     delTodo = (id) => {
-        this.setState({ todos: [...this.state.todos.filter(todo => todo.id !== id)] }); //We're looping through and returning a todo that doesn't match the id that's being passed in, thus creating the delete functionality
+        axios.delete(`http://jsonplaceholder.typicode.com/todos/${id}`)
+            .then(res => this.setState({ todos: [...this.state.todos.filter(todo => todo.id !== id)] }));
+
+         //We're looping through and returning a todo that doesn't match the id that's being passed in, thus creating the delete functionality
     }
 
   //  Add Todo
     addTodo = (title) => {
         // console.log(title)
-        const newTodo = {
-            id: uuidv4(),
+        axios.post('http://jsonplaceholder.typicode.com/todos', {
             title,
             completed: false
-        }
-        this.setState({ todos: [...this.state.todos, newTodo] })
+        })
+            .then(res => this.setState({ todos: [...this.state.todos, res.data] }));
     }
 
   render() {
